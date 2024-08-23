@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("ping", (msg) => {
-    socket.emit("pong", { ...msg, pong: Date.now() }); // sent to the client that sent the ping
+    socket.emit("pong", { ...msg }); // sent to the client that sent the ping
   });
 
   // for debugging

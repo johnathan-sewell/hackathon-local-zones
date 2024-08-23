@@ -50,6 +50,7 @@ pnpm install
 Run the server
 
 ```sh
+cd app
 pnpm install --production
 sudo node .
 ```
