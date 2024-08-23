@@ -1,10 +1,32 @@
-FROM node:18-bullseye-slim
+# Stage 1: base image
+FROM node:20-alpine AS base
 
-WORKDIR /app/
 
-COPY package.json /app
-RUN npm install
+# Stage 2: install production dependencies (pnpm install --prod)
+FROM base AS runtime-deps
 
-COPY index.mjs /app
+ARG NPM_TOKEN
 
-ENTRYPOINT ["node", "index.mjs"]
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY package*.json ./
+COPY pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+
+# Stage 3: the final runner image (using build + runtime-deps)
+FROM base AS runner
+
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+COPY --from=runtime-deps /app/node_modules ./node_modules
+COPY --from=build /app/server/ ./server
+COPY package*.json ./
+
+EXPOSE 80
+CMD ["node", "server/index.js"]
+

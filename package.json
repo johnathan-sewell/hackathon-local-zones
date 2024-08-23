@@ -2,18 +2,29 @@
   "name": "hackathon-local-zones",
   "version": "1.0.0",
   "description": "",
-  "main": "index.mjs",
+  "main": "server/index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cdk:bootstrap": "dotenv -e stack/.env -- cdk bootstrap",
+    "cdk:synth": "pnpm run cdk:clean && dotenv -e stack/.env -- cdk synth --no-staging --quiet=true",
+    "cdk:deploy": "pnpm run cdk:clean && dotenv -e stack/.env -- cdk deploy",
+    "cdk:clean": "rimraf cdk.out"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-cdk-lib": "^2.154.0",
     "express": "^4.19.2",
-    "sst": "3.0.66"
+    "sst": "3.0.66",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/aws-lambda": "8.10.143"
+    "@types/aws-lambda": "8.10.143",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.0",
+    "aws-cdk": "^2.154.0",
+    "constructs": "^10.3.0",
+    "dotenv-cli": "^7.4.2",
+    "rimraf": "^6.0.1"
   }
 }

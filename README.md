@@ -2,14 +2,53 @@
 
 ## How this project was created
 
-* Init SST `pnpm dlx sst init`
+- Installed express `pnpm i express`
 
-* Installed express `pnpm i express`
+- Added server/index.mjs (Start with `node .`)
 
-* Added server.mjs (Start with `node .`)
+- Added CDK stack for EC2 instance
 
-* Update sst.config.ts with cluster and service. (https://sst.dev/docs/start/aws/container)
+### Manual steps to prepare EC2 instance
 
-* Add a Dockerfile.
+SSH into the instance using the key pair. The key pair is created in the EC2 Dashboard.
 
-* Deploy to prod `pnpm sst deploy --stage production`
+The private key is downloaded stored on the local machine at ~/.ssh/Johnathan.pem.
+
+The key is associated with the instance in CDK.
+
+```sh
+ssh -i "Johnathan.pem" ubuntu@ec2-96-0-24-51.eu-north-1.compute.amazonaws.com
+```
+
+Update and upgrade the system.
+
+```sh
+sudo apt update
+sudo apt upgrade
+```
+
+Install Node
+
+```sh
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+Rsync the code to the instance
+
+```sh
+rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.stack' --exclude '.env' \
+-e "ssh -i ~/.ssh/Johnathan.pem" \
+. ubuntu@ec2-96-0-24-51.eu-north-1.compute.amazonaws.com:~/app
+```
+
+```sh
+sudo npm install -g pnpm
+pnpm install
+```
+
+Run the server
+
+```sh
+sudo node .
+```
