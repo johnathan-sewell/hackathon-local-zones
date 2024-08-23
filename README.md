@@ -16,8 +16,16 @@ The private key is downloaded stored on the local machine at ~/.ssh/Johnathan.pe
 
 The key is associated with the instance in CDK.
 
+CPH
+
 ```sh
 ssh -i "Johnathan.pem" ubuntu@ec2-96-0-24-72.eu-north-1.compute.amazonaws.com
+```
+
+EU
+
+```sh
+ssh -i "Johnathan-Eu.pem" ubuntu@ec2-52-59-201-158.eu-central-1.compute.amazonaws.com
 ```
 
 Update and upgrade the system.
@@ -36,15 +44,24 @@ sudo apt-get install -y nodejs
 
 Rsync the code to the instance
 
+CPH
+
 ```sh
 rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'stack' --exclude '.env' \
 -e "ssh -i ~/.ssh/Johnathan.pem" \
 . ubuntu@ec2-96-0-24-72.eu-north-1.compute.amazonaws.com:~/app
 ```
 
+EU
+
+```sh
+rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'stack' --exclude '.env' \
+-e "ssh -i ~/.ssh/Johnathan.pem" \
+. ubuntu@ec2-52-59-201-158.eu-central-1.compute.amazonaws.com:~/app
+```
+
 ```sh
 sudo npm install -g pnpm
-pnpm install
 ```
 
 Run the server
@@ -55,5 +72,9 @@ pnpm install --production
 sudo node .
 ```
 
-Browse to the client page
+Browse to the client page:
+CPH
 http://96.0.24.72/
+
+EU
+http://52.59.201.158/

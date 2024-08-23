@@ -7,7 +7,7 @@
   "scripts": {
     "cdk:bootstrap": "dotenv -e stack/.env -- cdk bootstrap",
     "cdk:synth": "pnpm run cdk:clean && dotenv -e stack/.env -- cdk synth --no-staging --quiet=true",
-    "cdk:deploy": "pnpm run cdk:clean && dotenv -e stack/.env -- cdk deploy",
+    "cdk:deploy": "pnpm run cdk:clean && dotenv -e stack/.env -- cdk deploy --all",
     "cdk:clean": "rimraf cdk.out",
     "dev": "node ."
   },
