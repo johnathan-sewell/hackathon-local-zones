@@ -76,7 +76,7 @@
             ["Average Round Trip Time", ...avgRoundTrips],
           ],
           types: {
-            // roundTrips: "bar", // ADD
+            "Round Trip Time": "bar",
           },
         },
       });
@@ -93,13 +93,13 @@
         const roundTrip = performance.now() - msg.ping;
 
         roundTrips.push(roundTrip);
-        if (roundTrips.length > 100) roundTrips.shift();
+        if (roundTrips.length > 50) roundTrips.shift();
 
         // take the last 10 round trips and calculate the average
         const last10Trips = roundTrips.slice(-10);
         const avgRoundTrip = last10Trips.reduce((a, b) => a + b, 0) / last10Trips.length;
         avgRoundTrips.push(avgRoundTrip);
-        if (avgRoundTrips.length > 100) avgRoundTrips.shift();
+        if (avgRoundTrips.length > 50) avgRoundTrips.shift();
 
         document.getElementById("#last-round-trip").textContent = `${roundTrip.toPrecision(3)}ms`;
         document.getElementById("#avg-round-trip").textContent = `${avgRoundTrip.toPrecision(3)}ms`;

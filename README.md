@@ -1,5 +1,7 @@
 # hackathon-local-zones
 
+https://docs.google.com/presentation/d/1hzxgTCB3pKFJy3soaQ5CqbbQ8YH5cOwCb-915GWqbpI/edit?usp=sharing
+
 ## How this project was created
 
 - Installed express `pnpm i express`
@@ -73,6 +75,7 @@ sudo node .
 ```
 
 Browse to the client page:
+
 CPH
 http://96.0.24.72/
 
