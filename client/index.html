@@ -2,59 +2,15 @@
 <html>
   <head>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.css"
+      integrity="sha512-cznfNokevSG7QPA5dZepud8taylLdvgr0lDqw/FEZIhluFsSwyvS81CMnRdrNSKwbsmc43LtRd2/WMQV+Z85AQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Local Zones Hackathon</title>
-    <style>
-      body {
-        margin: 0;
-        padding-bottom: 3rem;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      }
-
-      #form {
-        background: rgba(0, 0, 0, 0.15);
-        padding: 0.25rem;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        height: 3rem;
-        box-sizing: border-box;
-        backdrop-filter: blur(10px);
-      }
-      #input {
-        border: none;
-        padding: 0 1rem;
-        flex-grow: 1;
-        border-radius: 2rem;
-        margin: 0.25rem;
-      }
-      #input:focus {
-        outline: none;
-      }
-      #form > button {
-        background: #333;
-        border: none;
-        padding: 0 1rem;
-        margin: 0.25rem;
-        border-radius: 3px;
-        outline: none;
-        color: #fff;
-      }
-
-      #messages {
-        list-style-type: none;
-        margin-top: 200px;
-        padding: 0;
-      }
-      #messages > li {
-        padding: 0.5rem 1rem;
-      }
-      #messages > li:nth-child(odd) {
-        background: #efefef;
-      }
-    </style>
   </head>
   <body>
     <h1 class="text-xl m-4">Local Zones Hackathon</h1>
@@ -69,53 +25,99 @@
         <div class="text-xl font-mono" id="#avg-round-trip">0ms</div>
       </div>
     </div>
-    <ul id="messages"></ul>
-    <form id="form" action=""><input id="input" autocomplete="off" /><button>Send</button></form>
+
+    <div id="chart"></div>
+
+    <div class="flex flex-row p-4 gap-4">
+      <div>
+        <h2 class="text-l">Trip Data</h2>
+        <ul id="tripData" class="font-mono"></ul>
+      </div>
+      <div>
+        <h2 class="text-l">Avg. Trip Data</h2>
+        <ul id="avgTripData" class="font-mono"></ul>
+      </div>
+    </div>
+
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"
+      integrity="sha512-FHsFVKQ/T1KWJDGSbrUhTJyS1ph3eRrxI228ND0EGaEp6v4a/vGwPWd3Dtd/+9cI7ccofZvl/wulICEurHN1pg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"
+      integrity="sha512-+IpCthlNahOuERYUSnKFjzjdKXIbJ/7Dd6xvUp+7bEw0Jp2dg6tluyxLs+zq9BMzZgrLv8886T4cBSqnKiVgUw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
     <script>
+      const tripData = document.getElementById("tripData");
+      const avgTripData = document.getElementById("avgTripData");
+
+      const roundTrips = [];
+      const avgRoundTrips = [];
+
+      var chart = c3.generate({
+        bindto: "#chart",
+        axis: {
+          y: {
+            label: {
+              text: "ms",
+              position: "outer-middle",
+            },
+          },
+        },
+        data: {
+          columns: [
+            ["Round Trip Time", ...roundTrips],
+            ["Average Round Trip Time", ...avgRoundTrips],
+          ],
+          types: {
+            // roundTrips: "bar", // ADD
+          },
+        },
+      });
+
       // client will automatically try to reconnect after a small delay
       const socket = io();
-
-      const form = document.getElementById("form");
-      const input = document.getElementById("input");
-      const messages = document.getElementById("messages");
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (input.value) {
-          socket.emit("chat message", input.value);
-          input.value = "";
-        }
-      });
-
-      socket.on("chat message", (msg) => {
-        const item = document.createElement("li");
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
-      });
 
       setInterval(() => {
         socket.emit("ping", { ping: performance.now() });
         // socket.emit("ping", { ping: Date.now() });
       }, 1000);
 
-      const roundTrips = [];
       socket.on("pong", (msg) => {
-        const done = performance.now();
-
-        // const done = Date.now();
-        const ping = msg.ping;
-        const roundTrip = done - ping;
-        const item = document.createElement("li");
+        const roundTrip = performance.now() - msg.ping;
 
         roundTrips.push(roundTrip);
-        // keep the list of round trips to a maximum of 10
-        if (roundTrips.length > 10) roundTrips.shift();
-        const averageRoundTrip = roundTrips.reduce((a, b) => a + b, 0) / roundTrips.length;
+        if (roundTrips.length > 100) roundTrips.shift();
+
+        // take the last 10 round trips and calculate the average
+        const last10Trips = roundTrips.slice(-10);
+        const avgRoundTrip = last10Trips.reduce((a, b) => a + b, 0) / last10Trips.length;
+        avgRoundTrips.push(avgRoundTrip);
+        if (avgRoundTrips.length > 100) avgRoundTrips.shift();
 
         document.getElementById("#last-round-trip").textContent = `${roundTrip.toPrecision(3)}ms`;
-        document.getElementById("#avg-round-trip").textContent = `${averageRoundTrip.toPrecision(3)}ms`;
+        document.getElementById("#avg-round-trip").textContent = `${avgRoundTrip.toPrecision(3)}ms`;
+
+        chart.load({
+          columns: [
+            ["Round Trip Time", ...roundTrips],
+            ["Average Round Trip Time", ...avgRoundTrips],
+          ],
+        });
+
+        const item = document.createElement("li");
+        item.textContent = `${roundTrip.toPrecision(3)}ms`;
+        tripData.prepend(item);
+
+        const item2 = document.createElement("li");
+        item2.textContent = `${avgRoundTrip.toPrecision(3)}ms`;
+        avgTripData.prepend(item2);
       });
     </script>
   </body>

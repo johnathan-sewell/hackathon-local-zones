@@ -18,10 +18,6 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 
-  socket.on("chat message", (msg) => {
-    io.emit("chat message", msg); // sent to all connected clients
-  });
-
   socket.on("ping", (msg) => {
     socket.emit("pong", { ...msg }); // sent to the client that sent the ping
   });
