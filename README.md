@@ -1,6 +1,6 @@
 # hackathon-local-zones
 
-https://docs.google.com/presentation/d/1hzxgTCB3pKFJy3soaQ5CqbbQ8YH5cOwCb-915GWqbpI/edit?usp=sharing
+[https://docs.google.com/presentation/d/1hzxgTCB3pKFJy3soaQ5CqbbQ8YH5cOwCb-915GWqbpI/edit?usp=sharing](https://johnathan-sewell.github.io/AWS%20Local%20Zones)
 
 ## How this project was created
 
